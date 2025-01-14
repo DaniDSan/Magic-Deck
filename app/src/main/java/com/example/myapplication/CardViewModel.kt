@@ -13,6 +13,7 @@ class CardViewModel(private val deckRepository: DeckRepository) : ViewModel() {
     val cardList: LiveData<List<CardData>> = _cardList
     private val _cardFound = MutableLiveData<Boolean>()
     val cardFound: LiveData<Boolean> = _cardFound
+    val deckSize: LiveData<Int> = deckRepository.deckSize()
 
     val scryfallApi = retrofitInstance.create(ScryfallApi::class.java)
     //val deckDao = DeckDatabase(context).deckDao
@@ -47,8 +48,14 @@ class CardViewModel(private val deckRepository: DeckRepository) : ViewModel() {
         cardList.value?.get(cardPosition)?.cardQuantity =
             cardList.value?.get(cardPosition)?.cardQuantity!! + 1
         _cardList.value = cardList.value
-        viewModelScope.launch {
-            deckRepository.insertCard(cardList.value!!.get(cardPosition))
+        if (cardList.value?.get(cardPosition)?.cardQuantity == 1) {
+            viewModelScope.launch {
+                deckRepository.insertCard(cardList.value!!.get(cardPosition))
+            }
+        } else {
+            viewModelScope.launch {
+                deckRepository.updateCard(cardList.value!!.get(cardPosition))
+            }
         }
     }
 
@@ -57,6 +64,15 @@ class CardViewModel(private val deckRepository: DeckRepository) : ViewModel() {
             cardList.value?.get(cardPosition)?.cardQuantity =
                 cardList.value?.get(cardPosition)?.cardQuantity!! - 1
             _cardList.value = cardList.value
+        }
+        if (cardList.value?.get(cardPosition)?.cardQuantity == 0) {
+            viewModelScope.launch {
+                deckRepository.deleteCard(cardList.value!!.get(cardPosition))
+            }
+        } else {
+            viewModelScope.launch {
+                deckRepository.updateCard(cardList.value!!.get(cardPosition))
+            }
         }
     }
 

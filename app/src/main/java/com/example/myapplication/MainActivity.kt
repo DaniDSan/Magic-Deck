@@ -1,48 +1,36 @@
 package com.example.myapplication
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.tabs.TabLayout
 
 
 class MainActivity : AppCompatActivity() {
-    private val recyclerView: RecyclerView by lazy { findViewById(R.id.recyclerView) }
-    private val adapter: RecyclerViewAdapter by lazy { RecyclerViewAdapter(cardViewModel) }
-    private val cardViewModel: CardViewModel by lazy {
-        val deckDatabase = DeckDatabase.getDatabase(this)
-        val deckRepository = DeckRepository(deckDatabase.deckDao())
-        CardViewModel(deckRepository)
-    }
-
+    private val tabLayout by lazy { findViewById<TabLayout>(R.id.tabLayout) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        val etCardName: EditText = findViewById(R.id.etCardName)
-        val btnLoadCard: Button = findViewById(R.id.btnLoadCard)
-
-        btnLoadCard.setOnClickListener {
-            val cardName = etCardName.text.toString().trim()
-
-            // Si el texto esta vacio limpiar el viewmodel entero
-            if (cardName.isNotEmpty()) {
-                cardViewModel.loadCard(cardName)
-                cardViewModel.cardFound.observe(this) { cardFound ->
-                    if (!cardFound)
-                        Toast.makeText(this, "Card not found!", Toast.LENGTH_SHORT).show()
-                }
-                cardViewModel.cardList.observe(this) { card ->
-                    adapter.submitList(card)
-                }
-            } else
-                Toast.makeText(this, "Please enter a card name", Toast.LENGTH_SHORT).show()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainerView, CardSearchFragment())
+                .commit()
         }
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainerView, CardSearchFragment()).commit()
+
+                    1 -> supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainerView, DeckFragment()).commit()
+                }
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
     }
 }

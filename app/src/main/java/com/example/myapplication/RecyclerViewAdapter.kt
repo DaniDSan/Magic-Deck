@@ -31,7 +31,7 @@ class RecyclerViewAdapter(
         viewType: Int
     ): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.recyclerview_elements, parent, false)
+            .inflate(R.layout.recyclerview_card_search_elements, parent, false)
         return ViewHolder(view)
     }
 
