@@ -13,7 +13,10 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragmentContainerView, CardSearchFragment())
+                .add(R.id.fragmentContainerView, DeckFragment())
+                .commit()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView1, CardSearchFragment())
                 .commit()
         }
 
@@ -21,14 +24,16 @@ class MainActivity : AppCompatActivity() {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.position) {
                     0 -> supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerView, CardSearchFragment()).commit()
+                        .replace(R.id.fragmentContainerView, DeckFragment()).commit()
 
                     1 -> supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerView, DeckFragment()).commit()
+                        .replace(R.id.fragmentContainerView, CardSearchFragment()).commit()
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab?) {
             }
+
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
